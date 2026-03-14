@@ -72,6 +72,7 @@ nav {
   font-weight: 900; letter-spacing: 0.1em; color: #fff;
   text-shadow: 0 0 60px rgba(0,200,255,0.35), 0 0 120px rgba(0,200,255,0.15);
   line-height: 1; position: relative; z-index: 1;
+  transition: opacity 0.05s linear;
 }
 .hero-title span { color: var(--cyan); }
 .hero-sub {
@@ -349,3 +350,69 @@ body::after {
 
 
 #coding { background: var(--bg); }
+
+/* ── HERO CANVAS ── */
+#hero-canvas {
+  position: fixed;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 0;
+  pointer-events: none; /* let mouse events pass through to the canvas listener */
+}
+/* re-enable pointer events on the canvas specifically for mousemove */
+#hero-canvas { pointer-events: auto; }
+
+/* keep hero children above the canvas */
+#hero > *:not(#hero-canvas) { position: relative; z-index: 1; }
+
+/* ── HERO LOGO SLOT ── */
+.hero-logo {
+  width: 80px;
+  height: 80px;
+  margin-bottom: 1.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  z-index: 1;
+}
+.hero-logo img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  filter: drop-shadow(0 0 12px rgba(0,200,255,0.5));
+}
+/* placeholder ring shown when no image is set */
+.hero-logo-placeholder {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  border: 1px dashed var(--cyan-border);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.55rem;
+  letter-spacing: 0.2em;
+  color: var(--text-muted);
+  text-transform: uppercase;
+}
+
+/* ── ROBOT REVEAL TITLE — full cover ── */
+.robot-reveal-title {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: 'Orbitron', monospace;
+  font-size: clamp(2rem, 7vw, 6rem);
+  font-weight: 900;
+  color: #fff;
+  letter-spacing: 0.1em;
+  text-align: center;
+  padding: 2rem;
+  background: var(--bg);
+  will-change: transform, opacity;
+}
