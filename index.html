@@ -1,0 +1,869 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The MantaBots — FTC Team · FASNY</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Inter:wght@300;400;500;600&display=swap');
+
+  :root {
+    --cyan: #00c8ff;
+    --cyan-dim: rgba(0,200,255,0.15);
+    --cyan-border: rgba(0,200,255,0.25);
+    --bg: #050a0f;
+    --bg-mid: #080f18;
+    --bg-card: #0b1622;
+    --text: #c8dff0;
+    --text-dim: #4a7a9b;
+    --text-muted: #2a4a62;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  /* NO scroll-behavior:smooth on html — it fights instant snap. JS handles smooth where needed. */
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Inter', sans-serif;
+    overflow-x: hidden;
+    line-height: 1.7;
+  }
+
+  /* ── NAV ── */
+  nav {
+    position: fixed; top: 0; left: 0; right: 0; z-index: 1000;
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 1rem 3rem;
+    background: rgba(5,10,15,0.85);
+    backdrop-filter: blur(12px);
+    border-bottom: 1px solid var(--cyan-border);
+  }
+  .nav-logo {
+    font-family: 'Orbitron', monospace;
+    font-weight: 900; font-size: 1.1rem;
+    color: var(--cyan); letter-spacing: 0.15em;
+    text-decoration: none;
+  }
+  .nav-links { display: flex; gap: 2rem; list-style: none; }
+  .nav-links a {
+    font-size: 0.72rem; letter-spacing: 0.15em; font-weight: 500;
+    color: var(--text-dim); text-decoration: none; text-transform: uppercase;
+    transition: color 0.2s;
+  }
+  .nav-links a:hover { color: var(--cyan); }
+
+  /* ── HERO ── */
+  #hero {
+    height: 100vh;
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    position: relative; text-align: center; padding: 2rem;
+    background: radial-gradient(ellipse 80% 60% at 50% 70%, #071828 0%, var(--bg) 70%);
+    overflow: hidden;
+  }
+  #hero::before {
+    content: '';
+    position: absolute; inset: 0;
+    background-image:
+      linear-gradient(rgba(0,200,255,0.04) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(0,200,255,0.04) 1px, transparent 1px);
+    background-size: 60px 60px;
+    mask-image: radial-gradient(ellipse 80% 80% at 50% 100%, black 0%, transparent 70%);
+  }
+  .hero-eyebrow {
+    font-size: 0.65rem; letter-spacing: 0.45em; font-weight: 500;
+    color: var(--cyan); text-transform: uppercase; margin-bottom: 1.2rem; opacity: 0.8;
+  }
+  .hero-title {
+    font-family: 'Orbitron', monospace;
+    font-size: clamp(3rem, 10vw, 7rem);
+    font-weight: 900; letter-spacing: 0.1em; color: #fff;
+    text-shadow: 0 0 60px rgba(0,200,255,0.35), 0 0 120px rgba(0,200,255,0.15);
+    line-height: 1; position: relative; z-index: 1;
+  }
+  .hero-title span { color: var(--cyan); }
+  .hero-sub {
+    font-size: clamp(0.75rem, 1.8vw, 1rem);
+    color: var(--text-dim); margin-top: 1.2rem; font-weight: 300;
+    letter-spacing: 0.05em; position: relative; z-index: 1;
+  }
+  .hero-badges {
+    display: flex; gap: 1rem; margin-top: 2.5rem; justify-content: center;
+    flex-wrap: wrap; position: relative; z-index: 1;
+  }
+  .badge {
+    font-size: 0.65rem; letter-spacing: 0.2em; font-weight: 500;
+    text-transform: uppercase; padding: 0.45rem 1.2rem;
+    border: 1px solid var(--cyan-border); color: var(--cyan);
+    border-radius: 2px; background: var(--cyan-dim);
+  }
+  .scroll-hint {
+    position: absolute; bottom: 2.5rem; left: 50%; transform: translateX(-50%);
+    font-size: 0.6rem; letter-spacing: 0.35em; color: var(--text-muted);
+    text-transform: uppercase; animation: blink 2.5s ease-in-out infinite;
+  }
+  @keyframes blink { 0%,100%{opacity:0.3} 50%{opacity:1} }
+
+  /* ════════════════════════════════════════
+     SCROLL-SCRUB GALLERY
+     Uses a shared scrub() helper defined in JS.
+     anchor height = 100vh + STEP * (slides-1)
+  ════════════════════════════════════════ */
+  .scrub-anchor { position: relative; }
+  .scrub-stage {
+    position: sticky; top: 0; height: 100vh;
+    display: flex; align-items: center; justify-content: center;
+    overflow: hidden;
+  }
+
+  /* ── gallery specific ── */
+  #gallery-stage { background: var(--bg); z-index: 10; }
+  #gallery-stage::before {
+    content: 'GALLERY';
+    position: absolute; top: 1.8rem; left: 3rem;
+    font-family: 'Orbitron', monospace; font-size: 0.55rem;
+    letter-spacing: 0.4em; color: var(--text-muted);
+  }
+  .slide {
+    position: absolute; inset: 0;
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    opacity: 0; transition: opacity 0.7s ease;
+    padding: 5rem 2rem 2rem; pointer-events: none;
+  }
+  .slide.active { opacity: 1; pointer-events: auto; }
+  .slide-img-wrap {
+    width: min(82vw, 580px); aspect-ratio: 16/9;
+    border: 1px solid var(--cyan-border); border-radius: 3px;
+    overflow: hidden; background: var(--bg-card);
+    display: flex; align-items: center; justify-content: center;
+  }
+  .slide-img-wrap img { width: 100%; height: 100%; object-fit: cover; display: block; }
+  .slide-placeholder {
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    gap: 1rem; width: 100%; height: 100%;
+    background: linear-gradient(135deg, #08131e 0%, #0b1d2e 100%);
+  }
+  .ph-icon { width: 56px; height: 56px; opacity: 0.2; }
+  .ph-label { font-size: 0.65rem; letter-spacing: 0.35em; color: var(--text-muted); text-transform: uppercase; }
+  .slide-meta {
+    display: flex; flex-direction: column; align-items: center;
+    margin-top: 1.4rem; gap: 0.4rem;
+  }
+  .slide-dots { display: flex; gap: 8px; align-items: center; }
+  .dot {
+    width: 6px; height: 6px; border-radius: 50%;
+    background: var(--text-muted); transition: background 0.4s, transform 0.4s;
+  }
+  .dot.lit { background: var(--cyan); transform: scale(1.5); }
+  .slide-label {
+    font-family: 'Orbitron', monospace; font-size: clamp(0.85rem,2.5vw,1.3rem);
+    font-weight: 700; color: var(--cyan); letter-spacing: 0.2em; text-align: center;
+  }
+  .slide-caption {
+    font-size: 0.68rem; letter-spacing: 0.15em; color: var(--text-dim); text-align: center;
+  }
+  .scrub-hint {
+    position: absolute; bottom: 2rem; left: 50%; transform: translateX(-50%);
+    font-size: 0.58rem; letter-spacing: 0.35em; color: var(--text-muted);
+    text-transform: uppercase; animation: blink 2.5s ease-in-out infinite;
+    white-space: nowrap; pointer-events: none;
+  }
+
+  /* ════════════════════════════════════════
+     ROBOT SCROLL-SCRUB SECTION
+     Steps 0-3: step cards appear one by one (left panel)
+     Step 4:    video fades in full-bleed, text fades out
+  ════════════════════════════════════════ */
+  #robot-stage { background: var(--bg); z-index: 10; }
+
+  .robot-scrub-inner {
+    position: absolute; inset: 0;
+    display: grid; grid-template-columns: 1fr 1fr;
+    align-items: center;
+    padding: 0 4rem;
+    gap: 4rem;
+  }
+  @media(max-width:760px){
+    .robot-scrub-inner { grid-template-columns: 1fr; padding: 4rem 2rem; gap: 2rem; }
+  }
+
+  /* Left panel — header + steps */
+  .robot-left {
+    display: flex; flex-direction: column; gap: 0;
+  }
+  .robot-eyebrow {
+    font-size: 0.6rem; letter-spacing: 0.45em; color: var(--cyan);
+    text-transform: uppercase; font-weight: 500; margin-bottom: 0.8rem;
+  }
+  .robot-title {
+    font-family: 'Orbitron', monospace;
+    font-size: clamp(1.3rem, 3.5vw, 2.4rem);
+    font-weight: 700; color: #fff; letter-spacing: 0.08em;
+    line-height: 1.1; margin-bottom: 1.5rem;
+  }
+  .robot-intro-text {
+    font-size: 0.88rem; color: var(--text-dim); line-height: 1.85;
+    margin-bottom: 2rem; max-width: 460px;
+    transition: opacity 0.5s;
+  }
+
+  /* Step cards stack — each fades+slides in */
+  .robot-steps-stack { display: flex; flex-direction: column; gap: 0.9rem; }
+  .step-card {
+    background: var(--bg-card); border: 1px solid var(--cyan-border);
+    border-radius: 3px; padding: 1.2rem 1.4rem;
+    opacity: 0; transform: translateY(16px);
+    transition: opacity 0.5s ease, transform 0.5s ease;
+  }
+  .step-card.revealed { opacity: 1; transform: translateY(0); }
+  .step-num {
+    font-family: 'Orbitron', monospace; font-size: 0.55rem; letter-spacing: 0.3em;
+    color: var(--cyan); opacity: 0.6; margin-bottom: 0.4rem; display: block;
+  }
+  .step-card h3 { font-size: 0.82rem; font-weight: 600; color: #fff; margin-bottom: 0.3rem; }
+  .step-card p  { font-size: 0.78rem; color: var(--text-dim); line-height: 1.7; }
+
+  /* Right panel — video placeholder */
+  .robot-right {
+    position: relative;
+    width: 100%; aspect-ratio: 16/9;
+    background: var(--bg-card);
+    border: 1px solid var(--cyan-border);
+    border-radius: 3px; overflow: hidden;
+    display: flex; align-items: center; justify-content: center;
+  }
+
+  /* The video element — hidden until step 4 */
+  .robot-video-wrap {
+    position: absolute; inset: 0;
+    opacity: 0; transition: opacity 0.8s ease;
+    background: #000;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .robot-video-wrap.visible { opacity: 1; }
+
+  /* VIDEO: replace src with your file, e.g. src="robot.mp4" */
+  .robot-video-wrap video {
+    width: 100%; height: 100%; object-fit: cover; display: block;
+  }
+
+  /* Placeholder shown before video */
+  .robot-video-placeholder {
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    gap: 1rem; width: 100%; height: 100%;
+    background: linear-gradient(135deg, #08131e 0%, #0b1d2e 100%);
+    transition: opacity 0.8s ease;
+  }
+  .robot-video-placeholder.hidden { opacity: 0; pointer-events: none; }
+
+  /* Full-bleed video overlay — fades in over everything at step 4 */
+  .robot-fullbleed {
+    position: absolute; inset: 0;
+    opacity: 0; transition: opacity 0.9s ease;
+    pointer-events: none;
+    background: #000;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .robot-fullbleed.visible { opacity: 1; pointer-events: auto; }
+  .robot-fullbleed video {
+    width: 100%; height: 100%; object-fit: cover; display: block;
+  }
+  /* "ADD YOUR VIDEO" label inside fullbleed */
+  .fullbleed-label {
+    position: absolute; inset: 0;
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    gap: 1rem;
+  }
+  .fullbleed-label svg { opacity: 0.15; }
+  .fullbleed-label span {
+    font-size: 0.65rem; letter-spacing: 0.35em; color: var(--text-muted); text-transform: uppercase;
+  }
+
+  /* ── SECTION SCAFFOLDING ── */
+  section { padding: 7rem 2rem; }
+  .section-inner { max-width: 1000px; margin: 0 auto; }
+  .section-eyebrow {
+    font-size: 0.6rem; letter-spacing: 0.45em; color: var(--cyan);
+    text-transform: uppercase; font-weight: 500; margin-bottom: 0.8rem; display: block;
+  }
+  .section-title {
+    font-family: 'Orbitron', monospace;
+    font-size: clamp(1.5rem, 4vw, 2.8rem);
+    font-weight: 700; color: #fff; letter-spacing: 0.08em;
+    line-height: 1.1; margin-bottom: 2.5rem;
+  }
+  .section-divider { width: 40px; height: 2px; background: var(--cyan); margin-bottom: 2.5rem; opacity: 0.6; }
+
+  /* ── ABOUT ── */
+  #about { background: radial-gradient(ellipse 60% 50% at 80% 50%, #071828 0%, var(--bg) 70%); }
+  .about-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 4rem; align-items: start; }
+  .about-grid p { font-size: 0.9rem; color: var(--text-dim); margin-bottom: 1.2rem; line-height: 1.85; }
+  .about-stats { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-top: 2rem; }
+  .stat-card {
+    background: var(--bg-card); border: 1px solid var(--cyan-border);
+    border-radius: 3px; padding: 1.2rem 1.4rem;
+  }
+  .stat-card .num { font-family: 'Orbitron', monospace; font-size: 1.8rem; font-weight: 900; color: var(--cyan); line-height: 1; }
+  .stat-card .lbl { font-size: 0.62rem; letter-spacing: 0.2em; color: var(--text-dim); text-transform: uppercase; margin-top: 0.3rem; display: block; }
+  @media (max-width: 700px) { .about-grid { grid-template-columns: 1fr; gap: 2rem; } }
+
+  /* ── OUR STORY ── */
+  #story { background: var(--bg-mid); }
+  .timeline { display: flex; flex-direction: column; gap: 0; position: relative; }
+  .timeline::before {
+    content: ''; position: absolute; left: 18px; top: 0; bottom: 0;
+    width: 1px; background: var(--cyan-border);
+  }
+  .tl-item { display: flex; gap: 2rem; padding-bottom: 3rem; position: relative; }
+  .tl-dot {
+    width: 38px; height: 38px; border-radius: 50%;
+    background: var(--bg-card); border: 1px solid var(--cyan-border);
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0; position: relative; z-index: 1;
+    font-family: 'Orbitron', monospace; font-size: 0.55rem; font-weight: 700;
+    color: var(--cyan); letter-spacing: 0.05em;
+  }
+  .tl-content h3 {
+    font-family: 'Orbitron', monospace; font-size: 0.9rem; font-weight: 700;
+    color: var(--cyan); letter-spacing: 0.1em; margin-bottom: 0.5rem; text-transform: uppercase;
+  }
+  .tl-content p { font-size: 0.88rem; color: var(--text-dim); line-height: 1.8; }
+
+  /* ── SEASONS ── */
+  #seasons { background: var(--bg-mid); }
+  .seasons-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; }
+  .season-card {
+    background: var(--bg-card); border: 1px solid var(--cyan-border);
+    border-radius: 3px; padding: 2rem; position: relative; overflow: hidden;
+  }
+  .season-card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px; background: var(--cyan); opacity: 0.5; }
+  .season-card .year { font-family: 'Orbitron', monospace; font-size: 0.6rem; letter-spacing: 0.3em; color: var(--cyan); margin-bottom: 0.6rem; display: block; }
+  .season-card h3 { font-size: 1rem; font-weight: 600; color: #fff; margin-bottom: 0.8rem; }
+  .season-card p { font-size: 0.82rem; color: var(--text-dim); line-height: 1.75; }
+  .season-tag {
+    display: inline-block; margin-top: 1rem;
+    font-size: 0.6rem; letter-spacing: 0.2em; text-transform: uppercase;
+    padding: 0.3rem 0.8rem; border: 1px solid var(--cyan-border);
+    color: var(--cyan); border-radius: 2px; background: var(--cyan-dim);
+  }
+  @media (max-width: 600px) { .seasons-grid { grid-template-columns: 1fr; } }
+
+  /* ── OUTREACH ── */
+  #outreach { background: var(--bg); }
+  .outreach-body { font-size: 0.9rem; color: var(--text-dim); line-height: 1.85; max-width: 700px; }
+  .outreach-body p { margin-bottom: 1.2rem; }
+  .outreach-highlight {
+    border-left: 2px solid var(--cyan); padding-left: 1.5rem;
+    margin: 2rem 0; font-style: italic; color: var(--text); font-size: 0.92rem;
+  }
+
+  /* ── CONTACT / FOOTER ── */
+  #contact {
+    background: radial-gradient(ellipse 60% 80% at 50% 0%, #071828 0%, var(--bg) 60%);
+    text-align: center; padding: 6rem 2rem 4rem;
+  }
+  .contact-email {
+    font-family: 'Orbitron', monospace; font-size: clamp(1rem,3vw,1.6rem);
+    color: var(--cyan); letter-spacing: 0.15em; text-decoration: none;
+    display: inline-block; margin: 1.5rem 0;
+    border-bottom: 1px solid var(--cyan-border); padding-bottom: 0.3rem;
+    transition: color 0.2s;
+  }
+  .contact-email:hover { color: #fff; }
+  .social-links { display: flex; gap: 1.5rem; justify-content: center; margin-top: 1.5rem; }
+  .social-links a {
+    font-size: 0.65rem; letter-spacing: 0.25em; text-transform: uppercase;
+    color: var(--text-dim); text-decoration: none; padding: 0.5rem 1.2rem;
+    border: 1px solid var(--text-muted); border-radius: 2px;
+    transition: color 0.2s, border-color 0.2s;
+  }
+  .social-links a:hover { color: var(--cyan); border-color: var(--cyan); }
+  footer {
+    background: var(--bg); border-top: 1px solid var(--cyan-border);
+    padding: 1.5rem 3rem; display: flex;
+    align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 1rem;
+  }
+  footer p { font-size: 0.65rem; letter-spacing: 0.15em; color: var(--text-muted); }
+  footer a { color: var(--text-muted); text-decoration: none; transition: color 0.2s; }
+  footer a:hover { color: var(--cyan); }
+
+  body::after {
+    content: ''; position: fixed; inset: 0; pointer-events: none; z-index: 9999;
+    background: repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(0,0,0,0.03) 2px,rgba(0,0,0,0.03) 3px);
+  }
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <a class="nav-logo" href="#hero">MANTABOTS</a>
+  <ul class="nav-links">
+    <li><a href="#about">About</a></li>
+    <li><a href="#story">Our Story</a></li>
+    <li><a href="#robot-anchor">The Robot</a></li>
+    <li><a href="#seasons">Seasons</a></li>
+    <li><a href="#outreach">Outreach</a></li>
+    <li><a href="#contact">Contact</a></li>
+  </ul>
+</nav>
+
+<!-- HERO -->
+<section id="hero">
+  <p class="hero-eyebrow">First Tech Challenge · FASNY · Est. 2023</p>
+  <h1 class="hero-title">MANTA<span>BOTS</span></h1>
+  <p class="hero-sub">Designing · Building · Programming · Inspiring</p>
+  <div class="hero-badges">
+    <span class="badge">FTC Team</span>
+    <span class="badge">French-American School of NY</span>
+    <span class="badge">Season 2025–26 · Decode</span>
+  </div>
+  <span class="scroll-hint">▼ Scroll to explore</span>
+</section>
+
+<!-- ══════════════════════════════════
+     GALLERY SCROLL-SCRUB
+     To add images: swap each .slide-placeholder div
+     for <img src="your-photo.jpg" alt="...">
+════════════════════════════════════ -->
+<div class="scrub-anchor" id="gallery-anchor">
+  <div class="scrub-stage" id="gallery-stage">
+
+    <div class="slide active" id="slide-0">
+      <div class="slide-img-wrap">
+        <div class="slide-placeholder">
+          <svg class="ph-icon" viewBox="0 0 56 56" fill="none">
+            <rect x="6" y="14" width="44" height="28" rx="2" stroke="#00c8ff" stroke-width="1.2"/>
+            <circle cx="28" cy="28" r="7" stroke="#00c8ff" stroke-width="1.2"/>
+            <path d="M6 21h44M6 35h44" stroke="#00c8ff" stroke-width="0.7" stroke-dasharray="3 3"/>
+          </svg>
+          <span class="ph-label">Robot Photo · Drop image here</span>
+        </div>
+      </div>
+      <div class="slide-meta">
+        <div class="slide-dots">
+          <div class="dot lit"></div><div class="dot"></div><div class="dot"></div>
+        </div>
+        <div class="slide-label">RAYMOND JR V1.0</div>
+        <div class="slide-caption">Our FTC robot · November 2025</div>
+      </div>
+    </div>
+
+    <div class="slide" id="slide-1">
+      <div class="slide-img-wrap">
+        <div class="slide-placeholder">
+          <svg class="ph-icon" viewBox="0 0 56 56" fill="none">
+            <circle cx="18" cy="24" r="7" stroke="#00c8ff" stroke-width="1.2"/>
+            <circle cx="38" cy="24" r="7" stroke="#00c8ff" stroke-width="1.2"/>
+            <circle cx="28" cy="38" r="7" stroke="#00c8ff" stroke-width="1.2"/>
+            <path d="M18 24l10 14M38 24L28 38M18 24h20" stroke="#00c8ff" stroke-width="0.7"/>
+          </svg>
+          <span class="ph-label">Team Photo · Drop image here</span>
+        </div>
+      </div>
+      <div class="slide-meta">
+        <div class="slide-dots">
+          <div class="dot"></div><div class="dot lit"></div><div class="dot"></div>
+        </div>
+        <div class="slide-label">THE TEAM</div>
+        <div class="slide-caption">Passionate students from FASNY</div>
+      </div>
+    </div>
+
+    <div class="slide" id="slide-2">
+      <div class="slide-img-wrap">
+        <div class="slide-placeholder">
+          <svg class="ph-icon" viewBox="0 0 56 56" fill="none">
+            <path d="M28 6l3.5 10.5H42l-8.75 6.25 3.5 10.5L28 27l-8.75 6.25 3.5-10.5L14 16.5h10.5z" stroke="#00c8ff" stroke-width="1.2" stroke-linejoin="round"/>
+          </svg>
+          <span class="ph-label">Competition Photo · Drop image here</span>
+        </div>
+      </div>
+      <div class="slide-meta">
+        <div class="slide-dots">
+          <div class="dot"></div><div class="dot"></div><div class="dot lit"></div>
+        </div>
+        <div class="slide-label">IN COMPETITION</div>
+        <div class="slide-caption">FIRST Tech Challenge · Into the Deep 2024–25</div>
+      </div>
+    </div>
+
+    <span class="scrub-hint" id="gallery-hint">▼ Scroll to advance</span>
+  </div>
+</div>
+
+<!-- ABOUT -->
+<section id="about">
+  <div class="section-inner">
+    <span class="section-eyebrow">Who we are</span>
+    <h2 class="section-title">Built on Curiosity.<br>Driven by Innovation.</h2>
+    <div class="section-divider"></div>
+    <div class="about-grid">
+      <div>
+        <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.</p>
+        <p>Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>
+        <p>Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium doloremque laudantium, totam rem aperiam eaque ipsa quae ab illo inventore veritatis et quasi architecto beatae vitae dicta sunt explicabo.</p>
+      </div>
+      <div>
+        <div class="about-stats">
+          <div class="stat-card"><div class="num">2nd</div><span class="lbl">Year in FTC</span></div>
+          <div class="stat-card"><div class="num">FTC</div><span class="lbl">Competition Level</span></div>
+          <div class="stat-card"><div class="num">NY</div><span class="lbl">French-American School</span></div>
+          <div class="stat-card"><div class="num">Java</div><span class="lbl">Programming Language</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- OUR STORY -->
+<section id="story">
+  <div class="section-inner">
+    <span class="section-eyebrow">Our journey</span>
+    <h2 class="section-title">From LEGO Bricks<br>to Metal Frames</h2>
+    <div class="section-divider"></div>
+    <div class="timeline">
+      <div class="tl-item">
+        <div class="tl-dot">FLL</div>
+        <div class="tl-content">
+          <h3>Green Brick Road — FIRST LEGO League</h3>
+          <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat duis aute irure dolor.</p>
+        </div>
+      </div>
+      <div class="tl-item">
+        <div class="tl-dot">FTC</div>
+        <div class="tl-content">
+          <h3>Becoming the MantaBots — FIRST Tech Challenge</h3>
+          <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.</p>
+        </div>
+      </div>
+      <div class="tl-item">
+        <div class="tl-dot">NOW</div>
+        <div class="tl-content">
+          <h3>Season 2025–26 · Decode</h3>
+          <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nemo enim ipsam voluptatem quia voluptas sit aspernatur aut odit aut fugit, sed quia consequuntur magni dolores eos qui ratione voluptatem sequi nesciunt neque porro quisquam.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════
+     ROBOT SCROLL-SCRUB
+     Steps 0–3 reveal each step card.
+     Step 4 fades in the full-bleed video.
+
+     TO ADD YOUR VIDEO:
+     Find the <video> tag inside .robot-fullbleed
+     and set src="your-video.mp4"
+════════════════════════════════════ -->
+<div class="scrub-anchor" id="robot-anchor">
+  <div class="scrub-stage" id="robot-stage">
+
+    <!-- Left: heading + step cards -->
+    <div class="robot-scrub-inner" id="robot-inner">
+      <div class="robot-left">
+        <div class="robot-eyebrow">Engineering</div>
+        <h2 class="robot-title">Meet Raymond<br>Jr V1.0</h2>
+        <p class="robot-intro-text" id="robot-intro">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam laboris nisi aliquip commodo consequat.</p>
+        <div class="robot-steps-stack">
+          <div class="step-card" id="rcard-0">
+            <span class="step-num">STEP 01</span>
+            <h3>Intake System</h3>
+            <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.</p>
+          </div>
+          <div class="step-card" id="rcard-1">
+            <span class="step-num">STEP 02</span>
+            <h3>Ramp System</h3>
+            <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.</p>
+          </div>
+          <div class="step-card" id="rcard-2">
+            <span class="step-num">STEP 03</span>
+            <h3>Storage Compartment</h3>
+            <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>
+          </div>
+          <div class="step-card" id="rcard-3">
+            <span class="step-num">STEP 04</span>
+            <h3>Flywheel Launcher</h3>
+            <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium doloremque laudantium totam rem aperiam.</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Right: placeholder that hides when video appears -->
+      <div class="robot-right">
+        <div class="robot-video-placeholder" id="robot-ph">
+          <svg class="ph-icon" viewBox="0 0 56 56" fill="none">
+            <rect x="6" y="14" width="44" height="28" rx="2" stroke="#00c8ff" stroke-width="1.2"/>
+            <circle cx="28" cy="28" r="7" stroke="#00c8ff" stroke-width="1.2"/>
+          </svg>
+          <span class="ph-label">Robot photo</span>
+        </div>
+        <!-- Video preview in right panel (optional) -->
+        <div class="robot-video-wrap" id="robot-vid-small">
+          <!-- <video src="robot.mp4" autoplay muted loop playsinline></video> -->
+        </div>
+      </div>
+    </div>
+
+    <!-- Full-bleed video overlay — fades in at final step -->
+    <div class="robot-fullbleed" id="robot-fullbleed">
+      <div class="fullbleed-label">
+        <svg width="64" height="64" viewBox="0 0 64 64" fill="none">
+          <rect x="4" y="4" width="56" height="56" rx="4" stroke="#00c8ff" stroke-width="1.2"/>
+          <polygon points="26,20 26,44 46,32" fill="#00c8ff" opacity="0.4"/>
+        </svg>
+        <span>Add your video — set src="robot.mp4" on the &lt;video&gt; below</span>
+      </div>
+      <!--
+        TO ADD YOUR VIDEO:
+        1. Put your video file (e.g. robot.mp4) in the same folder as this HTML
+        2. Uncomment the line below and set the correct src
+      -->
+      <!-- <video src="robot.mp4" autoplay muted loop playsinline></video> -->
+    </div>
+
+    <span class="scrub-hint" id="robot-hint">▼ Scroll to reveal</span>
+  </div>
+</div>
+
+<!-- SEASONS -->
+<section id="seasons">
+  <div class="section-inner">
+    <span class="section-eyebrow">Competition seasons</span>
+    <h2 class="section-title">Our Seasons</h2>
+    <div class="section-divider"></div>
+    <div class="seasons-grid">
+      <div class="season-card">
+        <span class="year">2025 – 2026</span>
+        <h3>Decode</h3>
+        <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur excepteur sint occaecat cupidatat.</p>
+        <span class="season-tag">Current Season</span>
+      </div>
+      <div class="season-card">
+        <span class="year">2024 – 2025</span>
+        <h3>Into the Deep</h3>
+        <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nemo enim ipsam voluptatem quia voluptas sit aspernatur aut odit aut fugit sed quia consequuntur magni dolores eos qui ratione sequi nesciunt.</p>
+        <span class="season-tag">Completed</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- OUTREACH -->
+<section id="outreach">
+  <div class="section-inner">
+    <span class="section-eyebrow">Community</span>
+    <h2 class="section-title">Giving Back</h2>
+    <div class="section-divider"></div>
+    <div class="outreach-body">
+      <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.</p>
+      <div class="outreach-highlight">
+        "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua ut enim ad minim veniam."
+      </div>
+      <p>Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>
+      <p>Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium doloremque laudantium, totam rem aperiam eaque ipsa quae ab illo inventore veritatis et quasi architecto beatae vitae dicta sunt explicabo.</p>
+    </div>
+  </div>
+</section>
+
+<!-- CONTACT -->
+<section id="contact">
+  <div class="section-inner" style="text-align:center;">
+    <span class="section-eyebrow" style="display:block;text-align:center;">Get in touch</span>
+    <h2 class="section-title" style="margin-bottom:0.5rem;">Say Hello</h2>
+    <p style="color:var(--text-dim);font-size:0.85rem;margin-bottom:0.5rem;">Lorem ipsum dolor sit amet, consectetur adipiscing elit.</p>
+    <a class="contact-email" href="mailto:mantabots@gmail.com">mantabots@gmail.com</a>
+    <div class="social-links">
+      <a href="https://www.instagram.com/mantabots/" target="_blank" rel="noopener">Instagram</a>
+      <a href="https://www.youtube.com/@MantaBots-27318" target="_blank" rel="noopener">YouTube</a>
+      <a href="https://www.mantabots.org" target="_blank" rel="noopener">Official Site</a>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <p>© 2025 The MantaBots · FASNY · FIRST Tech Challenge</p>
+  <div style="display:flex;gap:2rem;">
+    <a href="https://www.mantabots.org/privacy-policy">Privacy Policy</a>
+    <a href="https://www.mantabots.org/terms-of-service">Terms of Service</a>
+  </div>
+</footer>
+
+<script>
+/* ══════════════════════════════════════════════════════════
+   SHARED SCROLL-SCRUB ENGINE
+   Creates an independent lock zone for each anchor element.
+   Wheel/touch scrolls advance steps; at edges the lock releases
+   and normal scrolling resumes in the correct direction.
+══════════════════════════════════════════════════════════ */
+
+const STEP  = window.innerHeight * 0.7; // scroll distance per step
+const COOL  = 700;                       // ms between advances
+
+function makeScrub({ anchorId, totalSteps, onStep, onHint }) {
+  const anchor = document.getElementById(anchorId);
+  anchor.style.height = (window.innerHeight + STEP * (totalSteps - 1)) + 'px';
+
+  let step     = 0;
+  let locked   = false;
+  let cooldown = false;
+
+  function snap() {
+    // Disable smooth scroll for the instant snap, then re-enable
+    document.documentElement.style.scrollBehavior = 'auto';
+    const top = anchor.getBoundingClientRect().top + window.scrollY;
+    window.scrollTo({ top, behavior: 'instant' });
+  }
+
+  function enter(dir) {
+    locked = true;
+    snap();
+    step = dir === 1 ? 0 : totalSteps - 1;
+    onStep(step);
+    if (onHint) onHint(step, totalSteps);
+  }
+
+  function advance(dir) {
+    if (cooldown) return;
+    const next = step + dir;
+
+    if (next < 0 || next >= totalSteps) {
+      // Release: scroll past anchor in the right direction
+      locked = false;
+      document.documentElement.style.scrollBehavior = 'auto';
+      if (dir === -1) {
+        // scroll up: jump to just above anchor
+        window.scrollTo({ top: anchor.getBoundingClientRect().top + window.scrollY - 10, behavior: 'instant' });
+        window.scrollBy({ top: -window.innerHeight * 0.5, behavior: 'smooth' });
+      } else {
+        // scroll down: jump to just below anchor
+        const bottom = anchor.getBoundingClientRect().bottom + window.scrollY;
+        window.scrollTo({ top: bottom, behavior: 'instant' });
+      }
+      return;
+    }
+
+    cooldown = true;
+    step = next;
+    onStep(step);
+    if (onHint) onHint(step, totalSteps);
+    setTimeout(() => { cooldown = false; }, COOL);
+  }
+
+  function shouldEnter(dir) {
+    const r = anchor.getBoundingClientRect();
+    if (dir ===  1) return r.top  <= window.innerHeight * 0.4 && r.top  >= -20;
+    if (dir === -1) return r.bottom >= window.innerHeight * 0.6 && r.bottom <= window.innerHeight + 20;
+    return false;
+  }
+
+  return { advance, enter, shouldEnter, isLocked: () => locked };
+}
+
+/* ── GALLERY SCRUB (3 image slides) ── */
+const gallerySlides = document.querySelectorAll('.slide');
+const galleryHintEl = document.getElementById('gallery-hint');
+
+const galleryScrub = makeScrub({
+  anchorId: 'gallery-anchor',
+  totalSteps: 3,
+  onStep(i) {
+    gallerySlides.forEach((s, idx) => s.classList.toggle('active', idx === i));
+  },
+  onHint(i, total) {
+    galleryHintEl.textContent = i === total - 1 ? '▼ Scroll to continue' : '▼ Scroll to advance';
+  }
+});
+
+/* ── ROBOT SCRUB (4 step cards + 1 video = 5 steps) ── */
+const robotCards    = document.querySelectorAll('.step-card');
+const robotFullbleed = document.getElementById('robot-fullbleed');
+const robotInner     = document.getElementById('robot-inner');
+const robotHintEl    = document.getElementById('robot-hint');
+
+const robotScrub = makeScrub({
+  anchorId: 'robot-anchor',
+  totalSteps: 5,   // steps 0-3 = cards, step 4 = video
+  onStep(i) {
+    // Reveal cards 0 through i-1 (step 0 = no cards, step 1 = card 0, etc.)
+    robotCards.forEach((c, idx) => c.classList.toggle('revealed', idx < i));
+
+    // At step 4 (video), fade in fullbleed + fade out the text panel
+    const showVideo = i >= 4;
+    robotFullbleed.classList.toggle('visible', showVideo);
+    robotInner.style.opacity = showVideo ? '0' : '1';
+    robotInner.style.transition = 'opacity 0.8s ease';
+  },
+  onHint(i, total) {
+    if      (i === 0)        robotHintEl.textContent = '▼ Scroll to reveal build steps';
+    else if (i < total - 1)  robotHintEl.textContent = '▼ Scroll for next step';
+    else                     robotHintEl.textContent = '▼ Scroll to continue';
+  }
+});
+
+/* ── UNIFIED WHEEL HANDLER ── */
+// Only one scrub can be locked at a time — first one that qualifies wins.
+const scrubs = [galleryScrub, robotScrub];
+
+window.addEventListener('wheel', (e) => {
+  const dir = e.deltaY > 0 ? 1 : -1;
+
+  // Check if any scrub is already locked
+  const active = scrubs.find(s => s.isLocked());
+  if (active) {
+    e.preventDefault();
+    active.advance(dir);
+    return;
+  }
+
+  // Check if we're entering a new scrub zone
+  for (const s of scrubs) {
+    if (s.shouldEnter(dir)) {
+      e.preventDefault();
+      s.enter(dir);
+      return;
+    }
+  }
+}, { passive: false });
+
+/* ── TOUCH ── */
+let touchStartY = 0;
+window.addEventListener('touchstart', (e) => { touchStartY = e.touches[0].clientY; }, { passive: true });
+window.addEventListener('touchmove',  (e) => { if (scrubs.some(s => s.isLocked())) e.preventDefault(); }, { passive: false });
+window.addEventListener('touchend',   (e) => {
+  const dy  = touchStartY - e.changedTouches[0].clientY;
+  if (Math.abs(dy) < 30) return;
+  const dir = dy > 0 ? 1 : -1;
+
+  const active = scrubs.find(s => s.isLocked());
+  if (active) { active.advance(dir); return; }
+
+  for (const s of scrubs) {
+    if (s.shouldEnter(dir)) { s.enter(dir); return; }
+  }
+});
+
+/* ── KEYBOARD ── */
+window.addEventListener('keydown', (e) => {
+  const active = scrubs.find(s => s.isLocked());
+  if (!active) return;
+  if (e.key === 'ArrowDown' || e.key === 'PageDown') { e.preventDefault(); active.advance(1); }
+  if (e.key === 'ArrowUp'   || e.key === 'PageUp')   { e.preventDefault(); active.advance(-1); }
+});
+
+/* ── SMOOTH NAV SCROLL (only when no scrub is locked) ── */
+document.querySelectorAll('a[href^="#"]').forEach(a => {
+  a.addEventListener('click', e => {
+    if (scrubs.some(s => s.isLocked())) return;
+    const target = document.querySelector(a.getAttribute('href'));
+    if (!target) return;
+    e.preventDefault();
+    document.documentElement.style.scrollBehavior = 'smooth';
+    target.scrollIntoView({ behavior: 'smooth' });
+  });
+});
+</script>
+</body>
+</html>
