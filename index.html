@@ -8,20 +8,19 @@
 </head>
 <body>
 
-<!-- NAV -->
 <nav>
   <a class="nav-logo" href="#hero">MANTABOTS</a>
   <ul class="nav-links">
     <li><a href="#about">About</a></li>
     <li><a href="#story">Our Story</a></li>
-    <li><a href="#robot-anchor">The Robot</a></li>
     <li><a href="#seasons">Seasons</a></li>
+    <li><a href="#robot">The Robot</a></li>
+    <li><a href="#coding">Coding</a></li>
     <li><a href="#outreach">Outreach</a></li>
     <li><a href="#contact">Contact</a></li>
   </ul>
 </nav>
 
-<!-- HERO -->
 <section id="hero">
   <p class="hero-eyebrow">First Tech Challenge · FASNY · Est. 2024</p>
   <h1 class="hero-title">MANTA<span>BOTS</span></h1>
@@ -34,8 +33,8 @@
   <span class="scroll-hint">▼ Scroll to explore</span>
 </section>
 
-<div class="scrub-anchor" id="gallery-anchor">
-  <div class="scrub-stage" id="gallery-stage">
+<section id="gallery">
+  <div class="gallery-stage">
 
     <div class="slide active" id="slide-0">
       <div class="slide-img-wrap">
@@ -48,13 +47,8 @@
           <span class="ph-label">Robot Photo · Drop image here</span>
         </div>
       </div>
-      <div class="slide-meta">
-        <div class="slide-dots">
-          <div class="dot lit"></div><div class="dot"></div><div class="dot"></div>
-        </div>
-        <div class="slide-label">RAYMOND JR V1.0</div>
-        <div class="slide-caption">Our FTC robot · November 2025</div>
-      </div>
+      <div class="slide-label">RAYMOND JR V3</div>
+      <div class="slide-caption">Our FTC robot · November 2025</div>
     </div>
 
     <div class="slide" id="slide-1">
@@ -69,13 +63,8 @@
           <span class="ph-label">Team Photo · Drop image here</span>
         </div>
       </div>
-      <div class="slide-meta">
-        <div class="slide-dots">
-          <div class="dot"></div><div class="dot lit"></div><div class="dot"></div>
-        </div>
-        <div class="slide-label">THE TEAM</div>
-        <div class="slide-caption">Passionate students from FASNY</div>
-      </div>
+      <div class="slide-label">THE TEAM</div>
+      <div class="slide-caption">Passionate students from FASNY</div>
     </div>
 
     <div class="slide" id="slide-2">
@@ -87,20 +76,19 @@
           <span class="ph-label">Competition Photo · Drop image here</span>
         </div>
       </div>
-      <div class="slide-meta">
-        <div class="slide-dots">
-          <div class="dot"></div><div class="dot"></div><div class="dot lit"></div>
-        </div>
-        <div class="slide-label">IN COMPETITION</div>
-        <div class="slide-caption">FIRST Tech Challenge · Into the Deep 2024–25</div>
-      </div>
+      <div class="slide-label">IN COMPETITION</div>
+      <div class="slide-caption">FIRST Tech Challenge · Into the Deep 2024–25</div>
     </div>
 
-    <span class="scrub-hint" id="gallery-hint">▼ Scroll to advance</span>
-  </div>
-</div>
+    <div class="gallery-dots" id="gallery-dots">
+      <button class="dot lit" data-index="0"></button>
+      <button class="dot"     data-index="1"></button>
+      <button class="dot"     data-index="2"></button>
+    </div>
 
-<!-- ABOUT -->
+  </div>
+</section>
+
 <section id="about">
   <div class="section-inner">
     <span class="section-eyebrow">Who we are</span>
@@ -124,7 +112,6 @@
   </div>
 </section>
 
-<!-- OUR STORY -->
 <section id="story">
   <div class="section-inner">
     <span class="section-eyebrow">Our journey</span>
@@ -156,69 +143,6 @@
   </div>
 </section>
 
-<!-- ROBOT SCRUB -->
-<div class="scrub-anchor" id="robot-anchor">
-  <div class="scrub-stage" id="robot-stage">
-
-    <div class="robot-scrub-inner" id="robot-inner">
-      <div class="robot-left">
-        <div class="robot-eyebrow">Engineering</div>
-        <h2 class="robot-title">Meet Raymond<br>Jr V1.0</h2>
-        <p class="robot-intro-text">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam laboris nisi aliquip commodo consequat.</p>
-        <div class="robot-steps-stack">
-          <div class="step-card">
-            <span class="step-num">STEP 01</span>
-            <h3>Intake System</h3>
-            <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.</p>
-          </div>
-          <div class="step-card">
-            <span class="step-num">STEP 02</span>
-            <h3>Ramp System</h3>
-            <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.</p>
-          </div>
-          <div class="step-card">
-            <span class="step-num">STEP 03</span>
-            <h3>Storage Compartment</h3>
-            <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>
-          </div>
-          <div class="step-card">
-            <span class="step-num">STEP 04</span>
-            <h3>Flywheel Launcher</h3>
-            <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium doloremque laudantium totam rem aperiam.</p>
-          </div>
-        </div>
-      </div>
-
-      <div class="robot-right">
-        <div class="robot-video-placeholder" id="robot-ph">
-          <svg class="ph-icon" viewBox="0 0 56 56" fill="none">
-            <rect x="6" y="14" width="44" height="28" rx="2" stroke="#00c8ff" stroke-width="1.2"/>
-            <circle cx="28" cy="28" r="7" stroke="#00c8ff" stroke-width="1.2"/>
-          </svg>
-          <span class="ph-label">Robot photo</span>
-        </div>
-        <div class="robot-video-wrap" id="robot-vid-small">
-          <video src="robotdesignvid1.mp4" autoplay muted loop playsinline></video>
-        </div>
-      </div>
-    </div>
-
-    <div class="robot-fullbleed" id="robot-fullbleed">
-      <div class="fullbleed-label">
-        <svg width="64" height="64" viewBox="0 0 64 64" fill="none">
-          <rect x="4" y="4" width="56" height="56" rx="4" stroke="#00c8ff" stroke-width="1.2"/>
-          <polygon points="26,20 26,44 46,32" fill="#00c8ff" opacity="0.4"/>
-        </svg>
-        <span>Add your video — uncomment the &lt;video&gt; tag below and set src="your-video.mp4"</span>
-      </div>
-      <!-- <video src="robot.mp4" autoplay muted loop playsinline></video> -->
-    </div>
-
-    <span class="scrub-hint" id="robot-hint">▼ Scroll to reveal</span>
-  </div>
-</div>
-
-<!-- SEASONS -->
 <section id="seasons">
   <div class="section-inner">
     <span class="section-eyebrow">Competition seasons</span>
@@ -241,7 +165,83 @@
   </div>
 </section>
 
-<!-- OUTREACH -->
+<section id="robot">
+
+  <div class="robot-reveal-anchor" id="robot-reveal-anchor">
+    <div class="robot-reveal-stage" id="robot-reveal-stage">
+
+      <div class="robot-video-bg">
+        <iframe
+          src="https://www.youtube.com/embed/mtBI276Ap5o?autoplay=1&mute=1&controls=0&loop=1&playlist=mtBI276Ap5o&playsinline=1"
+          frameborder="0"
+          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+          allowfullscreen>
+        </iframe>
+      </div>
+
+      <div class="robot-reveal-title" id="robot-reveal-title">
+        RAYMOND JUNIOR V3
+      </div>
+
+    </div>
+  </div>
+
+  <div class="robot-info">
+    <div class="section-inner">
+      <span class="section-eyebrow">Engineering</span>
+      <h2 class="section-title">Meet Raymond Junior V3</h2>
+      <div class="section-divider"></div>
+      <p class="robot-intro-text">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam laboris nisi aliquip commodo consequat.</p>
+      <div class="robot-steps-grid">
+        <div class="step-card fade-in-card">
+          <span class="step-num">STEP 01</span>
+          <h3>Intake System</h3>
+          <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.</p>
+        </div>
+        <div class="step-card fade-in-card">
+          <span class="step-num">STEP 02</span>
+          <h3>Ramp System</h3>
+          <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.</p>
+        </div>
+        <div class="step-card fade-in-card">
+          <span class="step-num">STEP 03</span>
+          <h3>Storage Compartment</h3>
+          <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>
+        </div>
+        <div class="step-card fade-in-card">
+          <span class="step-num">STEP 04</span>
+          <h3>Flywheel Launcher</h3>
+          <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium doloremque laudantium totam rem aperiam.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</section>
+
+<section id="coding">
+  <div class="section-inner">
+    <span class="section-eyebrow">Software</span>
+    <h2 class="section-title">How We Code</h2>
+    <div class="section-divider"></div>
+    <div class="about-grid">
+      <div>
+        <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.</p>
+        <p>Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>
+        <p>Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium doloremque laudantium, totam rem aperiam eaque ipsa quae ab illo inventore veritatis et quasi architecto beatae vitae dicta sunt explicabo.</p>
+      </div>
+      <div>
+        <div class="about-stats">
+          <div class="stat-card"><div class="num">Java</div><span class="lbl">Primary Language</span></div>
+          <div class="stat-card"><div class="num">FTC</div><span class="lbl">SDK</span></div>
+          <div class="stat-card"><div class="num">Git</div><span class="lbl">Version Control</span></div>
+          <div class="stat-card"><div class="num">Auto</div><span class="lbl">Autonomous Routines</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
 <section id="outreach">
   <div class="section-inner">
     <span class="section-eyebrow">Community</span>
@@ -258,7 +258,6 @@
   </div>
 </section>
 
-<!-- CONTACT -->
 <section id="contact">
   <div class="section-inner" style="text-align:center;">
     <span class="section-eyebrow" style="display:block;text-align:center;">Get in touch</span>
