@@ -1,13 +1,10 @@
 /* ── MOBILE NAV ── */
 const hamburger = document.getElementById('nav-hamburger');
 const navLinks  = document.getElementById('nav-links');
-
 hamburger.addEventListener('click', () => {
   hamburger.classList.toggle('open');
   navLinks.classList.toggle('open');
 });
-
-// Close menu when a link is clicked
 navLinks.querySelectorAll('a').forEach(a => {
   a.addEventListener('click', () => {
     hamburger.classList.remove('open');
@@ -15,19 +12,18 @@ navLinks.querySelectorAll('a').forEach(a => {
   });
 });
 
-/* ── HERO CANVAS — animated waves that react to mouse ── */
+/* ── HERO CANVAS — animated waves ── */
 const canvas = document.getElementById('hero-canvas');
 const ctx    = canvas.getContext('2d');
 let mx = 0.5, my = 0.5;
 let W, H;
 
 function resizeCanvas() {
-  W = canvas.width  = canvas.offsetWidth;
-  H = canvas.height = canvas.offsetHeight;
+  W = canvas.width  = window.innerWidth;
+  H = canvas.height = window.innerHeight;
 }
 resizeCanvas();
 window.addEventListener('resize', resizeCanvas);
-
 window.addEventListener('mousemove', e => {
   mx = e.clientX / window.innerWidth;
   my = e.clientY / window.innerHeight;
@@ -35,7 +31,6 @@ window.addEventListener('mousemove', e => {
 
 const WAVE_COUNT = 5;
 let t = 0;
-
 function drawWaves() {
   ctx.clearRect(0, 0, W, H);
   for (let i = 0; i < WAVE_COUNT; i++) {
@@ -45,7 +40,6 @@ function drawWaves() {
     const yBase  = H * (0.3 + i * 0.12);
     const xShift = (mx - 0.5) * 80;
     const alpha  = 0.04 + i * 0.015;
-
     ctx.beginPath();
     for (let x = 0; x <= W; x += 3) {
       const y = yBase
@@ -63,20 +57,41 @@ function drawWaves() {
 }
 drawWaves();
 
-/* ── HERO TITLE FLICKER ── */
-const heroTitle = document.querySelector('.hero-title');
-function flicker() {
-  const flickers = Math.floor(Math.random() * 3) + 1;
-  let delay = 0;
-  for (let i = 0; i < flickers; i++) {
-    setTimeout(() => { heroTitle.style.opacity = '0.15'; }, delay);
-    delay += 60 + Math.random() * 60;
-    setTimeout(() => { heroTitle.style.opacity = '1'; }, delay);
-    delay += 40 + Math.random() * 40;
+/* ── HERO TITLE — letter-by-letter light-up ── */
+const titleEl = document.getElementById('hero-title');
+
+// Wrap each character in a span
+// "MANTA" = white letters, "BOTS" = cyan letters
+const whiteText = 'MANTA';
+const cyanText  = 'BOTS';
+const allChars  = whiteText + cyanText;
+
+titleEl.innerHTML = '';
+const letterSpans = [];
+
+allChars.split('').forEach((ch, i) => {
+  const span = document.createElement('span');
+  span.classList.add('letter');
+  if (i >= whiteText.length) span.classList.add('cyan');
+  span.textContent = ch;
+  titleEl.appendChild(span);
+  letterSpans.push(span);
+});
+
+// Shuffle indices and light up each letter with a staggered delay
+function lightUpTitle() {
+  const indices = letterSpans.map((_, i) => i);
+  for (let i = indices.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [indices[i], indices[j]] = [indices[j], indices[i]];
   }
-  setTimeout(flicker, 2000 + Math.random() * 4000);
+  indices.forEach((idx, order) => {
+    setTimeout(() => {
+      letterSpans[idx].classList.add('lit');
+    }, order * 120 + 300);
+  });
 }
-setTimeout(flicker, 1500);
+lightUpTitle();
 
 /* ── GALLERY — auto-timer + clickable dots ── */
 const slides     = document.querySelectorAll('.slide');
@@ -91,22 +106,19 @@ function goToSlide(n) {
   slides[current].classList.add('active');
   dots[current].classList.add('lit');
 }
-
 function startTimer() {
   clearInterval(galleryTimer);
   galleryTimer = setInterval(() => goToSlide(current + 1), 4000);
 }
-
 dots.forEach(dot => {
   dot.addEventListener('click', () => {
     goToSlide(parseInt(dot.dataset.index));
     startTimer();
   });
 });
-
 startTimer();
 
-/* ── ROBOT REVEAL — scroll-driven scale + fade, then video in ── */
+/* ── ROBOT REVEAL — scroll-driven scale + fade, then video ── */
 const revealAnchor = document.getElementById('robot-reveal-anchor');
 const revealTitle  = document.getElementById('robot-reveal-title');
 const videoBg      = document.querySelector('.robot-video-bg');
@@ -116,15 +128,10 @@ function onScroll() {
   const total    = revealAnchor.offsetHeight - window.innerHeight;
   const progress = Math.min(Math.max(-rect.top / total, 0), 1);
   const p        = Math.min(progress / 0.6, 1);
-
-  // Title scales up and fades out
   revealTitle.style.transform = `scale(${1 + p * 1.5})`;
   revealTitle.style.opacity   = `${1 - p}`;
-
-  // Video only appears once title is fully gone
   videoBg.style.opacity = p >= 1 ? '1' : '0';
 }
-
 window.addEventListener('scroll', onScroll, { passive: true });
 onScroll();
 
