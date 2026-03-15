@@ -1,7 +1,7 @@
 /* ── HERO CANVAS — animated waves that react to mouse ── */
 const canvas = document.getElementById('hero-canvas');
 const ctx    = canvas.getContext('2d');
-let mx = 0, my = 0; // mouse position, normalized 0-1
+let mx = 0.5, my = 0.5;
 let W, H;
 
 function resizeCanvas() {
@@ -11,10 +11,9 @@ function resizeCanvas() {
 resizeCanvas();
 window.addEventListener('resize', resizeCanvas);
 
-canvas.addEventListener('mousemove', e => {
-  const r = canvas.getBoundingClientRect();
-  mx = (e.clientX - r.left) / W;
-  my = (e.clientY - r.top)  / H;
+window.addEventListener('mousemove', e => {
+  mx = e.clientX / window.innerWidth;
+  my = e.clientY / window.innerHeight;
 });
 
 const WAVE_COUNT = 5;
@@ -23,12 +22,12 @@ let t = 0;
 function drawWaves() {
   ctx.clearRect(0, 0, W, H);
   for (let i = 0; i < WAVE_COUNT; i++) {
-    const freq      = 0.008 + i * 0.003;
-    const amp       = 18 + i * 12 + my * 40;
-    const speed     = 0.012 + i * 0.004;
-    const yBase     = H * (0.3 + i * 0.12);
-    const xShift    = (mx - 0.5) * 80;
-    const alpha     = 0.04 + i * 0.015;
+    const freq   = 0.008 + i * 0.003;
+    const amp    = 18 + i * 12 + my * 40;
+    const speed  = 0.012 + i * 0.004;
+    const yBase  = H * (0.3 + i * 0.12);
+    const xShift = (mx - 0.5) * 80;
+    const alpha  = 0.04 + i * 0.015;
 
     ctx.beginPath();
     for (let x = 0; x <= W; x += 3) {
@@ -50,7 +49,6 @@ drawWaves();
 /* ── HERO TITLE FLICKER ── */
 const heroTitle = document.querySelector('.hero-title');
 function flicker() {
-  // random short flicker burst
   const flickers = Math.floor(Math.random() * 3) + 1;
   let delay = 0;
   for (let i = 0; i < flickers; i++) {
@@ -59,7 +57,6 @@ function flicker() {
     setTimeout(() => { heroTitle.style.opacity = '1'; }, delay);
     delay += 40 + Math.random() * 40;
   }
-  // schedule next flicker at random interval
   setTimeout(flicker, 2000 + Math.random() * 4000);
 }
 setTimeout(flicker, 1500);
@@ -92,17 +89,23 @@ dots.forEach(dot => {
 
 startTimer();
 
-/* ── ROBOT REVEAL — scroll-driven scale + fade ── */
+/* ── ROBOT REVEAL — scroll-driven scale + fade, then video in ── */
 const revealAnchor = document.getElementById('robot-reveal-anchor');
 const revealTitle  = document.getElementById('robot-reveal-title');
+const videoBg      = document.querySelector('.robot-video-bg');
 
 function onScroll() {
   const rect     = revealAnchor.getBoundingClientRect();
   const total    = revealAnchor.offsetHeight - window.innerHeight;
   const progress = Math.min(Math.max(-rect.top / total, 0), 1);
   const p        = Math.min(progress / 0.6, 1);
+
+  // Title scales up and fades out
   revealTitle.style.transform = `scale(${1 + p * 1.5})`;
   revealTitle.style.opacity   = `${1 - p}`;
+
+  // Video only appears once title is fully gone
+  videoBg.style.opacity = p >= 1 ? '1' : '0';
 }
 
 window.addEventListener('scroll', onScroll, { passive: true });
