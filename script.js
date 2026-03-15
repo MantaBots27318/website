@@ -1,3 +1,20 @@
+/* ── MOBILE NAV ── */
+const hamburger = document.getElementById('nav-hamburger');
+const navLinks  = document.getElementById('nav-links');
+
+hamburger.addEventListener('click', () => {
+  hamburger.classList.toggle('open');
+  navLinks.classList.toggle('open');
+});
+
+// Close menu when a link is clicked
+navLinks.querySelectorAll('a').forEach(a => {
+  a.addEventListener('click', () => {
+    hamburger.classList.remove('open');
+    navLinks.classList.remove('open');
+  });
+});
+
 /* ── HERO CANVAS — animated waves that react to mouse ── */
 const canvas = document.getElementById('hero-canvas');
 const ctx    = canvas.getContext('2d');
