@@ -44,24 +44,25 @@ nav {
 }
 .nav-links a:hover { color: var(--cyan); }
 
+/* ── HERO CANVAS ── */
+#hero-canvas {
+  position: fixed;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 0;
+  pointer-events: auto;
+}
+
 /* ── HERO ── */
 #hero {
   height: 100vh;
   display: flex; flex-direction: column;
   align-items: center; justify-content: center;
   position: relative; text-align: center; padding: 2rem;
-  background: radial-gradient(ellipse 80% 60% at 50% 70%, #071828 0%, var(--bg) 70%);
   overflow: hidden;
 }
-#hero::before {
-  content: '';
-  position: absolute; inset: 0;
-  background-image:
-    linear-gradient(rgba(0,200,255,0.04) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(0,200,255,0.04) 1px, transparent 1px);
-  background-size: 60px 60px;
-  mask-image: radial-gradient(ellipse 80% 80% at 50% 100%, black 0%, transparent 70%);
-}
+#hero > *:not(#hero-canvas) { position: relative; z-index: 1; }
 .hero-eyebrow {
   font-size: 0.65rem; letter-spacing: 0.45em; font-weight: 500;
   color: var(--cyan); text-transform: uppercase; margin-bottom: 1.2rem; opacity: 0.8;
@@ -97,9 +98,28 @@ nav {
 }
 @keyframes blink { 0%,100%{opacity:0.3} 50%{opacity:1} }
 
+/* ── HERO LOGO SLOT ── */
+.hero-logo {
+  width: 80px; height: 80px;
+  margin-bottom: 1.5rem;
+  display: flex; align-items: center; justify-content: center;
+  position: relative; z-index: 1;
+}
+.hero-logo img {
+  width: 100%; height: 100%; object-fit: contain;
+  filter: drop-shadow(0 0 12px rgba(0,200,255,0.5));
+}
+.hero-logo-placeholder {
+  width: 80px; height: 80px; border-radius: 50%;
+  border: 1px dashed var(--cyan-border);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 0.55rem; letter-spacing: 0.2em;
+  color: var(--text-muted); text-transform: uppercase;
+}
+
 /* ── GALLERY ── */
 #gallery {
-  background: var(--bg);
+  background: transparent;
   padding: 0;
   position: relative;
 }
@@ -209,82 +229,6 @@ section { padding: 7rem 2rem; }
 }
 .tl-content p { font-size: 0.88rem; color: var(--text-dim); line-height: 1.8; }
 
-/* ── ROBOT ── */
-#robot { padding: 0; background: var(--bg); }
-
-/* Sticky reveal zone — tall enough to scroll through */
-.robot-reveal-anchor {
-  position: relative;
-  height: 300vh;
-}
-.robot-reveal-stage {
-  position: sticky; top: 0;
-  height: 100vh; width: 100%;
-  overflow: hidden;
-  display: flex; align-items: center; justify-content: center;
-}
-
-/* Video fills the stage */
-.robot-video-bg {
-  position: absolute; inset: 0;
-  background: #000;
-}
-.robot-video-bg iframe {
-  width: 100%; height: 100%;
-  border: none;
-  object-fit: cover;
-  /* YouTube iframes don't support object-fit, so we scale them */
-  transform: scale(1.05);
-}
-
-/* Big title — scales up and fades as progress goes 0→1 */
-.robot-reveal-title {
-  position: absolute;
-  inset: 0;
-  z-index: 2;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-family: 'Orbitron', monospace;
-  font-size: clamp(2rem, 7vw, 6rem);
-  font-weight: 900;
-  color: #fff;
-  letter-spacing: 0.1em;
-  text-align: center;
-  padding: 2rem;
-  background: var(--bg);
-  will-change: opacity;
-}
-
-/* Info section below the sticky zone */
-.robot-info {
-  background: var(--bg);
-  padding: 7rem 2rem;
-}
-.robot-intro-text {
-  font-size: 0.88rem; color: var(--text-dim); line-height: 1.85;
-  margin-bottom: 3rem; max-width: 640px;
-}
-.robot-steps-grid {
-  display: grid; grid-template-columns: 1fr 1fr; gap: 1.2rem;
-}
-@media (max-width: 640px) { .robot-steps-grid { grid-template-columns: 1fr; } }
-
-/* Cards start invisible; .revealed added by IntersectionObserver */
-.step-card {
-  background: var(--bg-card); border: 1px solid var(--cyan-border);
-  border-radius: 3px; padding: 1.2rem 1.4rem;
-  opacity: 0; transform: translateY(20px);
-  transition: opacity 0.6s ease, transform 0.6s ease;
-}
-.step-card.revealed { opacity: 1; transform: translateY(0); }
-.step-num {
-  font-family: 'Orbitron', monospace; font-size: 0.55rem; letter-spacing: 0.3em;
-  color: var(--cyan); opacity: 0.6; margin-bottom: 0.4rem; display: block;
-}
-.step-card h3 { font-size: 0.82rem; font-weight: 600; color: #fff; margin-bottom: 0.3rem; }
-.step-card p  { font-size: 0.78rem; color: var(--text-dim); line-height: 1.7; }
-
 /* ── SEASONS ── */
 #seasons { background: var(--bg-mid); }
 .seasons-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; }
@@ -303,6 +247,75 @@ section { padding: 7rem 2rem; }
   color: var(--cyan); border-radius: 2px; background: var(--cyan-dim);
 }
 @media (max-width: 600px) { .seasons-grid { grid-template-columns: 1fr; } }
+
+/* ── ROBOT ── */
+#robot { padding: 0; background: transparent; }
+.robot-reveal-anchor {
+  position: relative;
+  height: 300vh;
+}
+.robot-reveal-stage {
+  position: sticky; top: 0;
+  height: 100vh; width: 100%;
+  overflow: hidden;
+  display: flex; align-items: center; justify-content: center;
+}
+.robot-video-bg {
+  position: absolute; inset: 0;
+  background: #000;
+  opacity: 0;
+  transition: opacity 0.5s ease;
+}
+.robot-video-bg iframe {
+  width: 100%; height: 100%;
+  border: none;
+  transform: scale(1.05);
+}
+.robot-reveal-title {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: 'Orbitron', monospace;
+  font-size: clamp(2rem, 7vw, 6rem);
+  font-weight: 900;
+  color: #fff;
+  letter-spacing: 0.1em;
+  text-align: center;
+  padding: 2rem;
+  background: transparent;
+  will-change: transform, opacity;
+}
+.robot-info {
+  background: transparent;
+  padding: 7rem 2rem;
+}
+.robot-intro-text {
+  font-size: 0.88rem; color: var(--text-dim); line-height: 1.85;
+  margin-bottom: 3rem; max-width: 640px;
+}
+.robot-steps-grid {
+  display: grid; grid-template-columns: 1fr 1fr; gap: 1.2rem;
+}
+@media (max-width: 640px) { .robot-steps-grid { grid-template-columns: 1fr; } }
+.step-card {
+  background: var(--bg-card); border: 1px solid var(--cyan-border);
+  border-radius: 3px; padding: 1.2rem 1.4rem;
+  opacity: 0; transform: translateY(20px);
+  transition: opacity 0.6s ease, transform 0.6s ease;
+}
+.step-card.revealed { opacity: 1; transform: translateY(0); }
+.step-num {
+  font-family: 'Orbitron', monospace; font-size: 0.55rem; letter-spacing: 0.3em;
+  color: var(--cyan); opacity: 0.6; margin-bottom: 0.4rem; display: block;
+}
+.step-card h3 { font-size: 0.82rem; font-weight: 600; color: #fff; margin-bottom: 0.3rem; }
+.step-card p  { font-size: 0.78rem; color: var(--text-dim); line-height: 1.7; }
+
+/* ── CODING ── */
+#coding { background: transparent; }
 
 /* ── OUTREACH ── */
 #outreach { background: var(--bg); }
@@ -346,73 +359,4 @@ footer a:hover { color: var(--cyan); }
 body::after {
   content: ''; position: fixed; inset: 0; pointer-events: none; z-index: 9999;
   background: repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(0,0,0,0.03) 2px,rgba(0,0,0,0.03) 3px);
-}
-
-
-#coding { background: var(--bg); }
-
-/* ── HERO CANVAS ── */
-#hero-canvas {
-  position: fixed;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-  z-index: 0;
-  pointer-events: none; /* let mouse events pass through to the canvas listener */
-}
-/* re-enable pointer events on the canvas specifically for mousemove */
-#hero-canvas { pointer-events: auto; }
-
-/* keep hero children above the canvas */
-#hero > *:not(#hero-canvas) { position: relative; z-index: 1; }
-
-/* ── HERO LOGO SLOT ── */
-.hero-logo {
-  width: 80px;
-  height: 80px;
-  margin-bottom: 1.5rem;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  position: relative;
-  z-index: 1;
-}
-.hero-logo img {
-  width: 100%;
-  height: 100%;
-  object-fit: contain;
-  filter: drop-shadow(0 0 12px rgba(0,200,255,0.5));
-}
-/* placeholder ring shown when no image is set */
-.hero-logo-placeholder {
-  width: 80px;
-  height: 80px;
-  border-radius: 50%;
-  border: 1px dashed var(--cyan-border);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 0.55rem;
-  letter-spacing: 0.2em;
-  color: var(--text-muted);
-  text-transform: uppercase;
-}
-
-/* ── ROBOT REVEAL TITLE — full cover ── */
-.robot-reveal-title {
-  position: absolute;
-  inset: 0;
-  z-index: 2;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-family: 'Orbitron', monospace;
-  font-size: clamp(2rem, 7vw, 6rem);
-  font-weight: 900;
-  color: #fff;
-  letter-spacing: 0.1em;
-  text-align: center;
-  padding: 2rem;
-  background: var(--bg);
-  will-change: transform, opacity;
 }
