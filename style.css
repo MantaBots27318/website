@@ -68,7 +68,7 @@ nav {
 .nav-hamburger.open span:nth-child(2) { opacity: 0; }
 .nav-hamburger.open span:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
 
-@media (max-width: 768px) {
+@media (orientation: portrait), (max-aspect-ratio: 1/1) {
   nav { padding: 1rem 1.5rem; }
 
   .nav-hamburger { display: flex; }
@@ -100,9 +100,8 @@ nav {
   }
   .nav-links li:last-child a { border-bottom: none; }
 
-  .hero-logo { width: 160px; height: 160px; }
+  .hero-logo { width: 40vw; height: 40vw; }
 }
-
 /* ── HERO CANVAS ── */
 #hero-canvas {
   position: fixed;
