@@ -12,7 +12,16 @@ navLinks.querySelectorAll('a').forEach(a => {
   });
 });
 
-/* ── HERO CANVAS — animated waves ── */
+/* ── BACK TO TOP ── */
+const backToTop = document.getElementById('back-to-top');
+window.addEventListener('scroll', () => {
+  backToTop.classList.toggle('visible', window.scrollY > window.innerHeight * 0.5);
+}, { passive: true });
+backToTop.addEventListener('click', () => {
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+});
+
+/* ── HERO CANVAS — animated waves (0.75× speed) ── */
 const canvas = document.getElementById('hero-canvas');
 const ctx    = canvas.getContext('2d');
 let mx = 0.5, my = 0.5;
@@ -36,7 +45,7 @@ function drawWaves() {
   for (let i = 0; i < WAVE_COUNT; i++) {
     const freq   = 0.008 + i * 0.003;
     const amp    = 18 + i * 12 + my * 40;
-    const speed  = 0.012 + i * 0.004;
+    const speed  = (0.012 + i * 0.004) * 0.75; // 0.75× speed
     const yBase  = H * (0.3 + i * 0.12);
     const xShift = (mx - 0.5) * 80;
     const alpha  = 0.04 + i * 0.015;
@@ -59,16 +68,12 @@ drawWaves();
 
 /* ── HERO TITLE — letter-by-letter light-up ── */
 const titleEl = document.getElementById('hero-title');
-
-// Wrap each character in a span
-// "MANTA" = white letters, "BOTS" = cyan letters
 const whiteText = 'MANTA';
 const cyanText  = 'BOTS';
 const allChars  = whiteText + cyanText;
 
 titleEl.innerHTML = '';
 const letterSpans = [];
-
 allChars.split('').forEach((ch, i) => {
   const span = document.createElement('span');
   span.classList.add('letter');
@@ -78,7 +83,6 @@ allChars.split('').forEach((ch, i) => {
   letterSpans.push(span);
 });
 
-// Shuffle indices and light up each letter with a staggered delay
 function lightUpTitle() {
   const indices = letterSpans.map((_, i) => i);
   for (let i = indices.length - 1; i > 0; i--) {
