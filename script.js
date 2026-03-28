@@ -154,6 +154,31 @@ const cardObserver = new IntersectionObserver(
 );
 fadeCards.forEach(c => cardObserver.observe(c));
 
+/* ── FUTURE SLIDESHOW ── */
+const futureSlides = document.querySelectorAll('.future-slide');
+const futureDots   = document.querySelectorAll('.future-dot');
+let futureCurrent  = 0;
+let futureTimer    = null;
+
+function goToFutureSlide(n) {
+  futureSlides[futureCurrent].classList.remove('active');
+  futureDots[futureCurrent].classList.remove('lit');
+  futureCurrent = (n + futureSlides.length) % futureSlides.length;
+  futureSlides[futureCurrent].classList.add('active');
+  futureDots[futureCurrent].classList.add('lit');
+}
+function startFutureTimer() {
+  clearInterval(futureTimer);
+  futureTimer = setInterval(() => goToFutureSlide(futureCurrent + 1), 4000);
+}
+futureDots.forEach(dot => {
+  dot.addEventListener('click', () => {
+    goToFutureSlide(parseInt(dot.dataset.future));
+    startFutureTimer();
+  });
+});
+startFutureTimer();
+
 /* ── SMOOTH NAV LINKS ── */
 document.querySelectorAll('a[href^="#"]').forEach(a => {
   a.addEventListener('click', e => {
