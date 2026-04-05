@@ -419,12 +419,12 @@ footer a:hover { color: var(--cyan); }
 .math-graph-slot {
   display: flex; align-items: center; justify-content: center;
 }
-.graph-placeholder {
-  width: 100%; aspect-ratio: 4/3;
-  background: linear-gradient(135deg, #08131e 0%, #0b1d2e 100%);
-  border: 1px solid var(--cyan-border); border-radius: 3px;
-  display: flex; flex-direction: column;
-  align-items: center; justify-content: center; gap: 1rem;
+.trajectory-graph {
+  width: 100%;
+  border: 1px solid var(--cyan-border);
+  border-radius: 3px;
+  display: block;
+  filter: drop-shadow(0 0 8px rgba(0,200,255,0.2));
 }
 
 /* ── FUTURE ── */
