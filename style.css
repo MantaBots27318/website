@@ -181,7 +181,7 @@ nav {
 .back-to-top:hover { color: #fff; border-color: #fff; }
 
 /* ── GALLERY ── */
-#gallery { background: transparent; padding: 0; position: relative; }
+#gallery { background: var(); padding: 0; position: relative; }
 #gallery::before {
   content: 'GALLERY';
   position: absolute; top: 1.8rem; left: 3rem; z-index: 2;
@@ -358,7 +358,7 @@ section { padding: 7rem 2rem; }
 .step-card p { font-size: 1rem; color: #fff; line-height: 1.7; }
 
 /* ── CODING ── */
-#coding { background: transparent; }
+#coding { background: var(--bg); }
 
 /* ── OUTREACH ── */
 #outreach { background: var(--bg); }
